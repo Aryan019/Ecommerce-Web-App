@@ -224,7 +224,7 @@ app.post('/register',async(req,res)=>{
    
     const newUser = new User(req.body);
     await newUser.save();
-    res.redirect('/login')
+    res.redirect('login')
 
 })
 
