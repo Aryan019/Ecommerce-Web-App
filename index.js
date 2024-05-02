@@ -267,6 +267,9 @@ app.get('/logout',(req,res)=>{
     res.redirect('allProducts')
 })
 
+app.get('/',(req,res)=>{
+    res.render('/login')
+})
 
 app.listen(3000,()=>{
     console.log("App is listening on port 3000")
