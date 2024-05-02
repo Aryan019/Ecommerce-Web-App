@@ -8,6 +8,8 @@ const methodOverride = require('method-override')
 // Establishing connection with mongoose
 const mongoose = require('mongoose');
 const Product = require('./models/product.js');
+const User = require('./models/user.js');
+
 
 
 mongoose.connect('mongodb://127.0.0.1:27017/rabloAssignDB')
@@ -28,28 +30,35 @@ app.set('view engine','ejs')
 app.use(express.urlencoded({extended : true}))
 app.use(methodOverride('_method'))
 
+// The carriers
+let featuredData;
+let isAuthenticated = 0;
+
+
 // Routing Starting from here 
 app.get('/allProducts',async(req,res)=>{
     const allProducts = await Product.find({})
     // console.log(allProducts)
 
-    res.render('index',{allProducts})
+    res.render('index',{allProducts,isAuthenticated})
 
 })
 
 // Route for adding in new products
 app.get('/products/new',(req,res)=>{
 
-    res.render('newProduct')
+    res.render('newProduct',{isAuthenticated})
 })
 
 
-let featuredData;
+
 
 // Route where the form submits to 
 app.post('/productsNew',async(req,res)=>{
     // Making the checkbox input from on to true 
 
+    if(isAuthenticated==1){
+  
     const checkFeatured = req.body.featured;
     if(req.body.image ==''){
         req.body.image = 'https://static.vecteezy.com/system/resources/previews/028/047/017/non_2x/3d-check-product-free-png.png'
@@ -71,22 +80,29 @@ app.post('/productsNew',async(req,res)=>{
     await newProduct.save();
 
     
-    res.redirect('/allProducts')
-})
+    res.redirect('/allProducts')}
+}
+)
 
 // Updating a product 
 app.get('/products/:id/edit',async(req,res)=>{
+
+    if(isAuthenticated==1){
 
     // Fetching the unique product id 
     const {id} = req.params;
 
     // finding the product to update 
     const product = await Product.findById(id)
-    res.render('edit',{product})
+    res.render('edit',{product,isAuthenticated})
+    }
 
 })
 
 app.put('/products/:id',async(req,res)=>{
+
+    if(isAuthenticated==1){
+
     console.log(req.body)
 
     const checkFeatured = req.body.featured;
@@ -105,15 +121,16 @@ app.put('/products/:id',async(req,res)=>{
     const product = await Product.findByIdAndUpdate(id,req.body,{runValidators:true, new:true});
     
     console.log(product)
-    res.redirect('/allProducts')
+    res.redirect('/allProducts')}
 })
 
 // Setting up the delete route 
 app.delete('/products/:id',async(req,res)=>{
+    if(isAuthenticated==1){
     const {id} = req.params;
     await Product.findByIdAndDelete(id)
 
-    res.redirect('/allProducts')
+    res.redirect('/allProducts')}
 
 })
 
@@ -121,7 +138,7 @@ app.delete('/products/:id',async(req,res)=>{
 app.get('/featuredProducts',async(req,res)=>{
     const msg = "Displaying all the featured items"
     featuredData = await Product.find({ featured: true });
-    res.render('featuredProducts',{featuredData,msg})
+    res.render('featuredProducts',{featuredData,msg,isAuthenticated})
 })
 
 // Sorting by price route (all products)
@@ -135,13 +152,13 @@ app.get('/products/:sort',async(req,res)=>{
     if(sort==='over'){
     const msg = "Displaying all products over 1000"
     productSort = await Product.find({ price: { $gte: 1000 } });
-    res.render('sortByCost',{productSort,msg})
+    res.render('sortByCost',{productSort,msg,isAuthenticated})
     }
 
     else if(sort==='under'){
         const msg = "Displaying all products under 1000"
         productSort = await Product.find({ price: { $lt: 1000 } });
-        res.render('sortByCost',{productSort,msg});
+        res.render('sortByCost',{productSort,msg,isAuthenticated});
 
     }
 
@@ -154,7 +171,7 @@ app.get('/products/:sort',async(req,res)=>{
             ]
         });
 
-        res.render('featuredProducts',{featuredData,msg});
+        res.render('featuredProducts',{featuredData,msg,isAuthenticated});
         
         
     }
@@ -168,14 +185,71 @@ app.get('/products/:sort',async(req,res)=>{
             ]
         });
 
-        res.render('featuredProducts',{featuredData,msg});
+        res.render('featuredProducts',{featuredData,msg,isAuthenticated});
         
 
     }
 
 })
 
+app.get('/login',(req,res)=>{
+    // res.send("Hey you have hit the login page")
+    res.render('login')
+})
 
+
+app.get('/register',(req,res)=>{
+    res.render('register')
+})
+
+// Post request for handling the register form data
+app.post('/register',async(req,res)=>{
+    console.log(req.body)
+   
+    const newUser = new User(req.body);
+    await newUser.save();
+    res.redirect('/login')
+
+})
+
+app.post('/login',(req,res)=>{
+
+    const userNameEntered = req.body.username;
+    const userPassEntered = req.body.password;
+
+    User.findOne({ username: userNameEntered})
+    .then(user => {
+        if (user) {
+            console.log('user found')
+            if(user.password === userPassEntered){
+                isAuthenticated = 1;
+                res.redirect('/allProducts')
+
+            }
+            else{
+                res.redirect('/login')
+            }
+
+
+        } else {
+            console.log('User not found');
+            res.redirect('/login')
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+
+
+
+    console.log(req.body)
+})
+
+
+app.get('/logout',(req,res)=>{
+    isAuthenticated=0;
+    res.redirect('allProducts')
+})
 
 
 app.listen(3000,()=>{

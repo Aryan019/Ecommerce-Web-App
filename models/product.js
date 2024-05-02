@@ -2,16 +2,7 @@
 
 // Connecting to the DB
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://127.0.0.1:27017/rabloAssignDB')
-.then(()=>{
-    console.log("Connection open for mongoose")
-})
 
-.catch(err =>{
-    console.log("Oh no mongo threw an error")
-    console.log(err)
-
-})
 
 
 

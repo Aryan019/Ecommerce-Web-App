@@ -22,7 +22,25 @@
       <li class="nav-item">
         <a class="nav-link" href="/products/new">Add New Product</a>
       </li>
+
+      
+      <% if(isAuthenticated==1){ %>
+        <li class="nav-item">
+          <a class="nav-link" href="/logout">Logout</a>
+        </li>
+        <% } %>
+
+        <% if(isAuthenticated==0){ %>
+          <li class="nav-item">
+            <a class="nav-link" href="/login">Login</a>
+          </li>
+
+          <% } %>
+
+
+
       </ul>
+
       
   </div>
   </nav>
@@ -75,6 +93,8 @@
                 <%  }%>
           </li>
         </ul>
+
+        <% if(isAuthenticated==1){ %>
         <div class="card-body">
           <!-- <a href="/products/<%=product._id%>/edit" class="card-link">Edit</a> -->
           <form class="d-inline-flex " action="/products/<%=product._id%>/edit" method="get">
@@ -86,6 +106,24 @@
         </div>
       </div>
       &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+
+      <% } else { %>
+        <div class="card-body">
+          <!-- <a href="/products/<%=product._id%>/edit" class="card-link">Edit</a> -->
+          <form class="d-inline-flex " action="/login" method="get">
+          <button class="btn btn-primary">Login to Edit</button></form>
+            
+          <br><br>
+          <!-- <a href="#" class="card-link">Delete</a> -->
+          <form class="d-inline-flex" action="/login" method="get">
+          <button class="btn btn-danger">Login to Delete</button></form>
+        </div>
+      </div>
+      &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+
       <% } %>
+
+      <% } %>
+      
 </body>
 </html>
