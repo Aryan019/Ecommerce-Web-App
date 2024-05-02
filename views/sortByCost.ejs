@@ -22,6 +22,10 @@
       <li class="nav-item">
         <a class="nav-link" href="/featuredProducts">Featured Products</a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/allProducts">All Products</a>
+      </li>
+   
    
       </ul>
   </div>
@@ -33,7 +37,7 @@
 <body>
     
     <br><br><br><br>
-    <h1 class="text-center">All Products</h1>
+    <h1 class="text-center"><%= msg %></h1>
     <p style="margin-left: 2%;"><a href="/featuredProducts">Featured products</a></p>
 
     <div class="dropdown" style="margin-left: 89%;">
@@ -52,7 +56,7 @@
 
 
 
-    <% for(let product of allProducts) { %>
+    <% for(let product of productSort) { %>
 
 
     <div class="card d-inline-flex p-4" style="width: 18rem;">

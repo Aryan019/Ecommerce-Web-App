@@ -114,6 +114,34 @@ app.delete('/products/:id',async(req,res)=>{
 
 })
 
+// route to get the featured products
+app.get('/featuredProducts',async(req,res)=>{
+    const allFeaturedProducts = await Product.find({ featured: true });
+    res.render('featuredProducts',{allFeaturedProducts})
+})
+
+// Sorting by price route
+app.get('/products/:sort',async(req,res)=>{
+
+    let productSort;
+
+    const {sort} = req.params;
+    console.log(sort);
+   
+    if(sort==='over'){
+    const msg = "Displaying all products over 1000"
+    productSort = await Product.find({ price: { $gt: 1000 } });
+    res.render('sortByCost',{productSort,msg})
+    }
+
+    else{
+        const msg = "Displaying all products under 1000"
+        productSort = await Product.find({ price: { $lt: 1000 } });
+        res.render('sortByCost',{productSort,msg});
+
+    }
+
+})
 
 app.listen(3000,()=>{
     console.log("App is listening on port 3000")
