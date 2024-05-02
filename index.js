@@ -43,6 +43,9 @@ app.get('/products/new',(req,res)=>{
     res.render('newProduct')
 })
 
+
+let featuredData;
+
 // Route where the form submits to 
 app.post('/productsNew',async(req,res)=>{
     // Making the checkbox input from on to true 
@@ -116,11 +119,12 @@ app.delete('/products/:id',async(req,res)=>{
 
 // route to get the featured products
 app.get('/featuredProducts',async(req,res)=>{
-    const allFeaturedProducts = await Product.find({ featured: true });
-    res.render('featuredProducts',{allFeaturedProducts})
+    const msg = "Displaying all the featured items"
+    featuredData = await Product.find({ featured: true });
+    res.render('featuredProducts',{featuredData,msg})
 })
 
-// Sorting by price route
+// Sorting by price route (all products)
 app.get('/products/:sort',async(req,res)=>{
 
     let productSort;
@@ -130,18 +134,49 @@ app.get('/products/:sort',async(req,res)=>{
    
     if(sort==='over'){
     const msg = "Displaying all products over 1000"
-    productSort = await Product.find({ price: { $gt: 1000 } });
+    productSort = await Product.find({ price: { $gte: 1000 } });
     res.render('sortByCost',{productSort,msg})
     }
 
-    else{
+    else if(sort==='under'){
         const msg = "Displaying all products under 1000"
         productSort = await Product.find({ price: { $lt: 1000 } });
         res.render('sortByCost',{productSort,msg});
 
     }
 
+    else if(sort==='underfeatured'){
+        const msg = "Displaying all featured items under 1000"
+        featuredData = await Product.find({ 
+            $and: [
+                { price: { $lt: 1000 } },
+                { featured: true }
+            ]
+        });
+
+        res.render('featuredProducts',{featuredData,msg});
+        
+        
+    }
+
+    else{
+        const msg = "Displaying all featured items over 1000"
+        featuredData = await Product.find({ 
+            $and: [
+                { price: { $gte: 1000 } },
+                { featured: true }
+            ]
+        });
+
+        res.render('featuredProducts',{featuredData,msg});
+        
+
+    }
+
 })
+
+
+
 
 app.listen(3000,()=>{
     console.log("App is listening on port 3000")
