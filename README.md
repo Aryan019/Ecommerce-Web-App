@@ -64,6 +64,6 @@ To run the project locally:
 
 ---
 
-Developed by Aryan Vyas. 
-Contact me on email - aryan19v@gmail.com 
-Enjoy managing your products efficiently with Rablo AssignDB! 🚀
+- Developed by Aryan Vyas
+- Contact me on email - aryan19v@gmail.com 
+- Enjoy managing your products efficiently🚀
