@@ -1,6 +1,6 @@
-# 🛍️ Rablo AssignDB - Product Management System
+# Product Management System
 
-Welcome to Rablo AssignDB, a product management system built with Node.js, Express, and MongoDB. 
+Welcome to Product Management System, a product management system built with Node.js, Express, and MongoDB. 
 This application allows you to manage products, with features for adding, editing, deleting, and sorting products by price.
  It also includes user authentication for secure access to product management functionalities.
 
