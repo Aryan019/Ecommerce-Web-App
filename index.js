@@ -57,7 +57,7 @@ console.log(cartUniqueId)
 app.get('/products',async(req,res)=>{
     const allProducts = await Product.find({})
     // console.log(allProducts)
-    console.log(cartUniqueId)
+    // console.log(cartUniqueId)
     res.render('index',{allProducts,isAuthenticated})
 
 })
@@ -242,7 +242,7 @@ app.post('/login',(req,res)=>{
             if(user.password === userPassEntered){
 
              
-                cartUniqueId = user._id;
+                cartUniqueId = user.user_id;
                 console.log(cartUniqueId)
                 isAuthenticated = 1;
                 res.redirect('/products')
@@ -280,7 +280,7 @@ app.get('/',(req,res)=>{
 
 app.get('/cart',(req,res)=>{
 
-    res.render('cart')
+    res.render('cart',{cartUniqueId})
 
 })
 
