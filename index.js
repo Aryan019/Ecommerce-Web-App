@@ -9,6 +9,7 @@ const methodOverride = require('method-override')
 const mongoose = require('mongoose');
 const Product = require('./models/product.js');
 const User = require('./models/user.js');
+const Cart = require('./models/cart.js')
 
 // Requring the env file 
 require("dotenv").config()
@@ -223,9 +224,30 @@ app.get('/register',(req,res)=>{
 // Post request for handling the register form data
 app.post('/register',async(req,res)=>{
     console.log(req.body)
-   
+    
+    const usernameID = req.body.username;
     const newUser = new User(req.body);
     await newUser.save();
+
+
+    // console.log(username)
+
+    // featuredData = await Product.find({ featured: true });
+    const userData = await User.find({username : usernameID})
+    console.log(userData[0])
+
+    console.log(userData[0].user_id)
+
+    // Initializing the new persons cart if he is visting first time 
+    // that is registering 
+
+    const cartId = userData[0].user_id +"";
+
+    const newCart = new Cart({user_id : cartId});
+    await newCart.save();
+
+
+
     res.redirect('/login')
 
 })
