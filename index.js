@@ -12,22 +12,10 @@ const User = require('./models/user.js');
 
 // Requring the env file 
 require("dotenv").config()
-const DB_Url = process.env.DB_URL   
+// const DB_Url = process.env.DB_URL   
 
 
-// mongoose.connect('mongodb://127.0.0.1:27017/rabloAssignDB')
-// .then(()=>{
-//     console.log("Connection open for mongoose")
-// })
-
-// .catch(err =>{
-//     console.log("Oh no mongo threw an error")
-//     console.log(err)
-
-// })
-
-// Connecting to the online db 
-mongoose.connect(DB_Url)
+mongoose.connect('mongodb://127.0.0.1:27017/rabloAssignDB')
 .then(()=>{
     console.log("Connection open for mongoose")
 })
@@ -37,6 +25,18 @@ mongoose.connect(DB_Url)
     console.log(err)
 
 })
+
+// Connecting to the online db 
+// mongoose.connect(DB_Url)
+// .then(()=>{
+//     console.log("Connection open for mongoose")
+// })
+
+// .catch(err =>{
+//     console.log("Oh no mongo threw an error")
+//     console.log(err)
+
+// })
 
 
 
@@ -49,13 +49,15 @@ app.use(methodOverride('_method'))
 // The carriers
 let featuredData;
 let isAuthenticated = 0;
+let cartUniqueId = "";
+console.log(cartUniqueId)
 
 
 // Routing Starting from here 
-app.get('/allProducts',async(req,res)=>{
+app.get('/products',async(req,res)=>{
     const allProducts = await Product.find({})
     // console.log(allProducts)
-
+    console.log(cartUniqueId)
     res.render('index',{allProducts,isAuthenticated})
 
 })
@@ -70,7 +72,7 @@ app.get('/products/new',(req,res)=>{
 
 
 // Route where the form submits to 
-app.post('/productsNew',async(req,res)=>{
+app.post('/products',async(req,res)=>{
     // Making the checkbox input from on to true 
 
     if(isAuthenticated==1){
@@ -96,7 +98,7 @@ app.post('/productsNew',async(req,res)=>{
     await newProduct.save();
 
     
-    res.redirect('/allProducts')}
+    res.redirect('/products')}
 }
 )
 
@@ -137,7 +139,7 @@ app.put('/products/:id',async(req,res)=>{
     const product = await Product.findByIdAndUpdate(id,req.body,{runValidators:true, new:true});
     
     console.log(product)
-    res.redirect('/allProducts')}
+    res.redirect('/products')}
 })
 
 // Setting up the delete route 
@@ -146,7 +148,7 @@ app.delete('/products/:id',async(req,res)=>{
     const {id} = req.params;
     await Product.findByIdAndDelete(id)
 
-    res.redirect('/allProducts')}
+    res.redirect('/products')}
 
 })
 
@@ -238,8 +240,12 @@ app.post('/login',(req,res)=>{
         if (user) {
             console.log('user found')
             if(user.password === userPassEntered){
+
+             
+                cartUniqueId = user._id;
+                console.log(cartUniqueId)
                 isAuthenticated = 1;
-                res.redirect('/allProducts')
+                res.redirect('/products')
 
             }
             else{
@@ -264,11 +270,18 @@ app.post('/login',(req,res)=>{
 
 app.get('/logout',(req,res)=>{
     isAuthenticated=0;
-    res.redirect('allProducts')
+    res.redirect('products')
 })
 
 app.get('/',(req,res)=>{
     res.render('login')
+})
+
+
+app.get('/cart',(req,res)=>{
+
+    res.render('cart')
+
 })
 
 app.listen(3000,()=>{
