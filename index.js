@@ -51,7 +51,8 @@ app.use(methodOverride('_method'))
 let featuredData;
 let isAuthenticated = 0;
 let cartUniqueId = "";
-console.log(cartUniqueId)
+// console.log(cartUniqueId)
+
 
 
 // Routing Starting from here 
@@ -299,6 +300,42 @@ app.get('/',(req,res)=>{
     res.render('login')
 })
 
+
+// Setting up the cart 
+{/* <form class="d-inline-flex " action="/products/<%=product._id%>/edit" method="get">
+          <button class="btn btn-primary">Edit</button></form> */}
+
+app.post('/cart/:id',async(req,res)=>{
+
+    console.log("here i am ")
+console.log(cartUniqueId)
+
+const product_id = req.params.id;
+console.log(product_id)
+
+let quantity = 1;
+// const cartData = await Cart.findOne({user_id : cartUniqueId});
+
+// console.log(cartData.items);
+
+// const oldArr = cartData.items;
+// oldArr.push({ product_id, quantity });
+// console.log(oldArr);
+
+  const updatedCart = await Cart.findOneAndUpdate(
+      { user_id : cartUniqueId}, // Filter to find the document
+      { $push: { items: { product_id, quantity } }, $set: { updatedAt: Date.now() } }, // Update operation
+      { new: true, useFindAndModify: false } // Options: return the updated document
+    );
+
+console.log(updatedCart);
+
+
+// console.log(cartData)
+res.send("Added to the cart")
+
+
+})
 
 app.get('/cart',(req,res)=>{
 
