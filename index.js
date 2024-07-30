@@ -10,6 +10,7 @@ const mongoose = require('mongoose');
 const Product = require('./models/product.js');
 const User = require('./models/user.js');
 const Cart = require('./models/cart.js')
+const Order = require('./models/order.js')
 
 // Requring the env file 
 require("dotenv").config()
@@ -304,9 +305,43 @@ app.get('/',(req,res)=>{
 })
 
 
-// Setting up the cart 
-{/* <form class="d-inline-flex " action="/products/<%=product._id%>/edit" method="get">
-          <button class="btn btn-primary">Edit</button></form> */}
+
+// Removing something from the cart 
+app.get('/cart/delete/:id',(req,res)=>{
+
+
+    // Product id to be deleted
+    const productId = req.params.id;
+    const userId = cartUniqueId;
+
+    // Current user id 
+
+
+    async function deleteCartItem(userId, productId) {
+        try {
+          const result = await Cart.updateOne(
+            { user_id: userId },
+            { $pull: { items: { product_id: productId } } }
+          );
+      
+          if (result.nModified > 0) {
+            console.log(`Item with product_id ${productId} removed from cart for user_id ${userId}`);
+          } else {
+            console.log(`No item found with product_id ${productId} for user_id ${userId}`);
+          }
+        } catch (error) {
+          console.error('Error removing item from cart:', error);
+        }
+      }
+
+      deleteCartItem(userId,productId);
+
+    res.redirect('/cart')
+
+
+ 
+})
+
 
 app.post('/cart/:id',async(req,res)=>{
 
@@ -446,6 +481,34 @@ async function findProductsByUserId(cartUniqueId) {
       console.error('Error:', err);
     });
 
+
+})
+
+// /order/<%=item.product_id%> 
+
+app.get('/order',async(req,res)=>{
+
+    console.log("Reached here")
+
+    const carts = await Cart.find({ user_id: cartUniqueId });
+
+    console.log(carts[0].items)
+
+   const order = new Order({
+    user_id : cartUniqueId,
+    items: carts[0].items,
+    quantity : carts[0].quantity,
+
+   });
+   await order.save();
+
+   const deletecart = await Cart.findOneAndDelete({user_id: cartUniqueId })
+//    await deletecart.save();
+
+   const newCart = new Cart({user_id : cartUniqueId});
+   await newCart.save();
+    
+   
 
 })
 
