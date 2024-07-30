@@ -15,7 +15,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/rabloAssignDB')
 
 })
 
-
+// Use this for seeding
 const productsData = [
     {
         name: 'Product 1',
