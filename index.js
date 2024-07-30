@@ -52,15 +52,18 @@ let featuredData;
 let isAuthenticated = 0;
 let cartUniqueId = "";
 // console.log(cartUniqueId)
-
+let alert = 0;
 
 
 // Routing Starting from here 
 app.get('/products',async(req,res)=>{
+
+    
+   
     const allProducts = await Product.find({})
     // console.log(allProducts)
     // console.log(cartUniqueId)
-    res.render('index',{allProducts,isAuthenticated})
+    res.render('index',{allProducts,isAuthenticated,alert})
 
 })
 
@@ -328,11 +331,24 @@ let quantity = 1;
       { new: true, useFindAndModify: false } // Options: return the updated document
     );
 
+
+console.log("Cart data")
 console.log(updatedCart);
 
+alert = 1;
 
+res.redirect('/products')
+
+
+
+
+
+
+
+
+// alert("Item successfully added to the cart")
 // console.log(cartData)
-res.send("Added to the cart")
+// res.send("Added to the cart")
 
 
 })

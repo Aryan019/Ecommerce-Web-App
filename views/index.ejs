@@ -99,23 +99,21 @@
         </div>
       </div>
       &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-
-      <% } else{ %>
+      <% } else { %>
 
         <div class="card-body">
           <!-- <a href="/products/<%=product._id%>/edit" class="card-link">Edit</a> -->
-          <form class="d-inline-flex " action="/cart/<%=product._id%>" method="post">
-            <button class="btn btn-primary">Add to Cart</button></form>
-            <br><br>
+          <form class="d-inline-flex" action="/cart/<%=product._id%>" method="post">
+            <button id="add-to-cart-btn" class="btn btn-primary">Add to Cart</button>
+          </form>
+          <br><br>
           <!-- <a href="#" class="card-link">Delete</a> -->
           <!-- <form class="d-inline-flex" action="/login" method="get"> -->
         
         </div>
-      </div>
-      &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-
-
-
+        </div>
+        &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+        
         <% } %>
 
 
@@ -123,4 +121,7 @@
 
       <% } %>
 </body>
+<% if(alert === 1) {%>
+<script>alert("Added to Cart")</script>
+  <% } %>
 </html>
