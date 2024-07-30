@@ -316,6 +316,16 @@ console.log(cartUniqueId)
 const product_id = req.params.id;
 console.log(product_id)
 
+// Finding out the price from the product id 
+const particularProduct = await Product.findOne({_id : product_id})
+console.log("particular pro is ")
+console.log("price is")
+console.log(particularProduct.price);
+
+const price = particularProduct.price;
+
+
+
 let quantity = 1;
 // const cartData = await Cart.findOne({user_id : cartUniqueId});
 
@@ -327,7 +337,7 @@ let quantity = 1;
 
   const updatedCart = await Cart.findOneAndUpdate(
       { user_id : cartUniqueId}, // Filter to find the document
-      { $push: { items: { product_id, quantity } }, $set: { updatedAt: Date.now() } }, // Update operation
+      { $push: { items: { product_id,price, quantity } }, $set: { updatedAt: Date.now() } }, // Update operation
       { new: true, useFindAndModify: false } // Options: return the updated document
     );
 
@@ -353,9 +363,31 @@ res.redirect('/products')
 
 })
 
-app.get('/cart',(req,res)=>{
+app.get('/cart',async(req,res)=>{
 
-    res.render('cart',{cartUniqueId})
+    // res.render('cart',{cartUniqueId})
+    // const getAllProducts = 
+
+
+
+
+   async function findProductsByUserId(cartUniqueId) {
+        try {
+          const carts = await Cart.find({ user_id: cartUniqueId });
+      
+          // Extract all items from the found carts
+          const allItems = carts.reduce((acc, cart) => {
+            return acc.concat(cart.items);
+          }, []);
+      
+          console.log(allItems);
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      findProductsByUserId(cartUniqueId);
+      res.render('cart')
 
 })
 
