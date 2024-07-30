@@ -447,25 +447,6 @@ async function findProductsByUserId(cartUniqueId) {
     });
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      
-
 })
 
 app.listen(3000,()=>{
