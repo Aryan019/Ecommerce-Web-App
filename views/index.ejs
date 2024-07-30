@@ -25,13 +25,13 @@
 
       <% if(isAuthenticated==1){ %>
         <li class="nav-item">
-          <a class="nav-link" href="/logout">Logout</a>
+          <a class="nav-link" href="/logout">User Mode</a>
         </li>
         <% } %>
 
         <% if(isAuthenticated==0){ %>
           <li class="nav-item">
-            <a class="nav-link" href="/login">Login</a>
+            <a class="nav-link" href="/login">Admin Mode</a>
           </li>
 
           <% } %>
@@ -43,6 +43,12 @@
               </li>
 
           <% } %>
+
+
+
+          <li class="nav-item">
+            <a class="nav-link" href="/getOrdersData">View Orders</a>
+          </li>
 
         
    

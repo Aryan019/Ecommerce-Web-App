@@ -335,6 +335,7 @@ app.get('/cart/delete/:id',(req,res)=>{
       }
 
       deleteCartItem(userId,productId);
+      alert = 0
 
     res.redirect('/cart')
 
@@ -489,6 +490,7 @@ async function findProductsByUserId(cartUniqueId) {
 app.get('/order',async(req,res)=>{
 
     console.log("Reached here")
+    alert = 0;
 
     const carts = await Cart.find({ user_id: cartUniqueId });
 
@@ -507,9 +509,68 @@ app.get('/order',async(req,res)=>{
 
    const newCart = new Cart({user_id : cartUniqueId});
    await newCart.save();
+
+   
+   res.redirect('/products')
     
    
 
+})
+
+app.get('/getOrdersData',(req,res)=>{
+
+
+    async function findProductsByUserId(cartUniqueId) {
+        try {
+          const orders = await Order.find({ user_id: cartUniqueId });
+      
+          // Extract all items from the found carts
+          const allItems = orders.reduce((acc, cart) => {
+            return acc.concat(cart.items);
+          }, []);
+      
+          // Fetch product details for each item
+          const detailedItems = await Promise.all(allItems.map(async (item) => {
+            if (item.product_id) {
+              const product = await Product.findById(item.product_id);
+              return {
+                ...item._doc,
+                product: product ? product._doc : null
+              };
+            }
+            return item;
+          }));
+          
+        //   console.log(detailedItems)
+          return detailedItems;
+          
+        } catch (err) {
+          console.error(err);
+          throw err; // Re-throw the error to handle it in the `.catch` block of the promise chain
+        }
+      }
+      
+      findProductsByUserId(cartUniqueId)
+        .then(allItems => {
+          // Handle the resolved promise here
+          console.log("All the items are:");
+          console.log(allItems);
+          // Assuming `res` is available in your controller context
+        //   res.render('cart', { allItems });
+        res.render('order', {allItems})
+        })
+        .catch(err => {
+          // Handle any errors here
+          console.error('Error:', err);
+        });
+    
+
+    
+
+
+
+
+   
 })
 
 app.listen(3000,()=>{
