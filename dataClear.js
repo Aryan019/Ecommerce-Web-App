@@ -17,7 +17,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/rabloAssignDB')
 
 
 
-
+// No need here 
 
 // Handling the errors
 async function clearData(){
