@@ -3,7 +3,8 @@ const express = require('express');
 const app  = express();
 const path = require('path')
 const methodOverride = require('method-override')
-
+const session = require('express-session')
+const bodyParser = require("body-parser");
 
 // Establishing connection with mongoose
 const mongoose = require('mongoose');
@@ -11,6 +12,8 @@ const Product = require('./models/product.js');
 const User = require('./models/user.js');
 const Cart = require('./models/cart.js')
 const Order = require('./models/order.js')
+const Session = require('./models/session.js')
+
 
 // Requring the env file 
 require("dotenv").config()
@@ -47,6 +50,124 @@ app.set('views',path.join(__dirname,'views'))
 app.set('view engine','ejs')
 app.use(express.urlencoded({extended : true}))
 app.use(methodOverride('_method'))
+
+
+app.use(session({
+    secret : process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized:false,
+    cookie: { secure: false }
+}))
+
+app.use(
+    bodyParser.json({
+      type: ["application/form-data", "application/json"], // Support json encoded bodies
+    })
+  );
+
+
+app.use((req, res, next) => {
+    req.ipAddress = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    next();
+});
+
+
+
+app.get('/login',(req,res)=>{
+    // res.send("Hey you have hit the login page")
+    res.render('login')
+})
+
+app.post('/login',async(req,res)=>{
+
+    // const userNameEntered = req.body.username;
+    // const userPassEntered = req.body.password;
+
+    // User.findOne({ username: userNameEntered})
+    // .then(user => {
+    //     if (user) {
+
+
+
+    //         console.log('user found')
+    //         if(user.password === userPassEntered){
+
+    //             req.session.userId = user._id;
+
+    //             // Create a new session record
+    //             await new Session({
+    //                 user_id: user._id,
+    //                 loginTime: Date.now(),
+    //                 ipAddress: req.ipAddress
+    //             }).save();
+
+             
+             
+    //             cartUniqueId = user.user_id;
+    //             console.log(cartUniqueId)
+    //             isAuthenticated = 1;
+    //             res.redirect('/products')
+
+    //         }
+    //         else{
+    //             res.redirect('/login')
+    //         }
+
+
+    //     } else {
+    //         console.log('User not found');
+    //         res.redirect('/login')
+    //     }
+    // })
+    // .catch(error => {
+    //     console.error('Error:', error);
+    // });
+
+
+
+    // console.log(req.body)
+
+    const userNameEntered = req.body.username;
+    const userPassEntered = req.body.password;
+  
+    try {
+      const user = await User.findOne({ username: userNameEntered });
+  
+      if (user) {
+        console.log('user found');
+        if (user.password === userPassEntered) {
+          req.session.userId = user._id;
+  
+          // Create a new session record
+        const sessionConig =new Session({
+            user_id: user._id,
+            loginTime: Date.now(),
+            ipAddress: req.ip
+          })
+
+
+          await sessionConig.save();
+  
+          cartUniqueId = user.user_id;
+          console.log(cartUniqueId);
+          isAuthenticated = 1;
+          res.redirect('/products');
+        } else {
+          res.redirect('/login');
+        }
+      } else {
+        console.log('User not found');
+        res.redirect('/login');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      res.redirect('/login');
+    }
+  
+    console.log(req.body);
+
+  
+})
 
 // The carriers
 let featuredData;
@@ -216,10 +337,7 @@ app.get('/products/:sort',async(req,res)=>{
 
 })
 
-app.get('/login',(req,res)=>{
-    // res.send("Hey you have hit the login page")
-    res.render('login')
-})
+
 
 
 app.get('/register',(req,res)=>{
@@ -257,48 +375,66 @@ app.post('/register',async(req,res)=>{
 
 })
 
-app.post('/login',(req,res)=>{
-
-    const userNameEntered = req.body.username;
-    const userPassEntered = req.body.password;
-
-    User.findOne({ username: userNameEntered})
-    .then(user => {
-        if (user) {
-            console.log('user found')
-            if(user.password === userPassEntered){
-
-             
-                cartUniqueId = user.user_id;
-                console.log(cartUniqueId)
-                isAuthenticated = 1;
-                res.redirect('/products')
-
-            }
-            else{
-                res.redirect('/login')
-            }
-
-
-        } else {
-            console.log('User not found');
-            res.redirect('/login')
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
 
 
 
-    console.log(req.body)
-})
 
 
-app.get('/logout',(req,res)=>{
+
+
+app.get('/userMode',async(req,res)=>{
+    // if (req.session.userId) {
+    //     // Update logout time
+    //     await Session.findOneAndUpdate(
+    //         { user_id: req.session.userId, logoutTime: { $exists: false } },
+    //         { logoutTime: Date.now() }
+    //     );
+    //     req.session.destroy();
+    // }
+
     isAuthenticated=0;
-    res.redirect('products')
+    res.redirect('/products');
+
+
+
+   
+    // res.redirect('products')
 })
+
+
+app.get('/logout',async(req,res)=>{
+    if (req.session.userId) {
+        // Update logout time
+        await Session.findOneAndUpdate(
+            { user_id: req.session.userId, logoutTime: { $exists: false } },
+            { logoutTime: Date.now() }
+        );
+        req.session.destroy();
+    }
+
+    isAuthenticated=0;
+    res.redirect('/login');
+
+})
+
+
+app.get('/sessions',async(req,res)=>{
+
+    try {
+        const allSessionInfo = await Session.find({});
+        res.status(201).json(allSessionInfo);
+      } catch (error) {
+        res.status(500).json({ error: 'An error occurred while fetching session data.' });
+      }
+
+})
+
+
+
+app.get('/paymentGateway',(req,res)=>{
+    res.send("Payment gateway will be here ");
+})
+
 
 app.get('/',(req,res)=>{
     res.render('login')
@@ -563,14 +699,7 @@ app.get('/getOrdersData',(req,res)=>{
           // Handle any errors here
           console.error('Error:', err);
         });
-    
-
-    
-
-
-
-
-   
+  
 })
 
 app.listen(3000,()=>{
