@@ -371,36 +371,96 @@ app.get('/cart',async(req,res)=>{
 
 
 
-   async function findProductsByUserId(cartUniqueId) {
-        try {
-          const carts = await Cart.find({ user_id: cartUniqueId });
-          
+//    async function findProductsByUserId(cartUniqueId) {
+//         try {
+//           const carts = await Cart.find({ user_id: cartUniqueId });
+
       
-          // Extract all items from the found carts
-          const allItems = carts.reduce((acc, cart) => {
-            return acc.concat(cart.items);
-          }, []);
+//           // Extract all items from the found carts
+//           const allItems = carts.reduce((acc, cart) => {
+//             return acc.concat(cart.items);
+//           }, []);
       
-          console.log(allItems);
-          return allItems;
-        } catch (err) {
-          console.error(err);
+//           console.log(allItems);
+//           return allItems;
+//         } catch (err) {
+//           console.error(err);
+//         }
+//       }
+
+
+
+// findProductsByUserId(cartUniqueId)
+// .then(allItems => {
+//   // Handle the resolved promise here
+//   console.log("all the items are")
+//   console.log(allItems);
+//   res.render('cart',{allItems})
+// })
+// .catch(err => {
+//   // Handle any errors here
+//   console.error('Error:', err);
+// });
+
+
+async function findProductsByUserId(cartUniqueId) {
+    try {
+      const carts = await Cart.find({ user_id: cartUniqueId });
+  
+      // Extract all items from the found carts
+      const allItems = carts.reduce((acc, cart) => {
+        return acc.concat(cart.items);
+      }, []);
+  
+      // Fetch product details for each item
+      const detailedItems = await Promise.all(allItems.map(async (item) => {
+        if (item.product_id) {
+          const product = await Product.findById(item.product_id);
+          return {
+            ...item._doc,
+            product: product ? product._doc : null
+          };
         }
-      }
+        return item;
+      }));
+      
+    //   console.log(detailedItems)
+      return detailedItems;
+      
+    } catch (err) {
+      console.error(err);
+      throw err; // Re-throw the error to handle it in the `.catch` block of the promise chain
+    }
+  }
+  
+  findProductsByUserId(cartUniqueId)
+    .then(allItems => {
+      // Handle the resolved promise here
+      console.log("All the items are:");
+      console.log(allItems);
+      // Assuming `res` is available in your controller context
+      res.render('cart', { allItems });
+    })
+    .catch(err => {
+      // Handle any errors here
+      console.error('Error:', err);
+    });
 
 
 
-findProductsByUserId(cartUniqueId)
-.then(allItems => {
-  // Handle the resolved promise here
-  console.log("all the items are")
-  console.log(allItems);
-  res.render('cart',{allItems})
-})
-.catch(err => {
-  // Handle any errors here
-  console.error('Error:', err);
-});
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
