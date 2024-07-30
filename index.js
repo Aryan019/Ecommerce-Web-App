@@ -374,6 +374,7 @@ app.get('/cart',async(req,res)=>{
    async function findProductsByUserId(cartUniqueId) {
         try {
           const carts = await Cart.find({ user_id: cartUniqueId });
+          
       
           // Extract all items from the found carts
           const allItems = carts.reduce((acc, cart) => {
@@ -381,13 +382,29 @@ app.get('/cart',async(req,res)=>{
           }, []);
       
           console.log(allItems);
+          return allItems;
         } catch (err) {
           console.error(err);
         }
       }
 
-      findProductsByUserId(cartUniqueId);
-      res.render('cart')
+
+
+findProductsByUserId(cartUniqueId)
+.then(allItems => {
+  // Handle the resolved promise here
+  console.log("all the items are")
+  console.log(allItems);
+  res.render('cart',{allItems})
+})
+.catch(err => {
+  // Handle any errors here
+  console.error('Error:', err);
+});
+
+
+
+      
 
 })
 
