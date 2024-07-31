@@ -20,19 +20,9 @@ require("dotenv").config()
 // const DB_Url = process.env.DB_URL   
 
 
-mongoose.connect('mongodb://127.0.0.1:27017/rabloAssignDB')
-.then(()=>{
-    console.log("Connection open for mongoose")
-})
+// Closing in the offline method 
 
-.catch(err =>{
-    console.log("Oh no mongo threw an error")
-    console.log(err)
-
-})
-
-// Connecting to the online db 
-// mongoose.connect(DB_Url)
+// mongoose.connect('mongodb://127.0.0.1:27017/rabloAssignDB')
 // .then(()=>{
 //     console.log("Connection open for mongoose")
 // })
@@ -42,6 +32,18 @@ mongoose.connect('mongodb://127.0.0.1:27017/rabloAssignDB')
 //     console.log(err)
 
 // })
+
+// Connecting to the online db 
+mongoose.connect(process.env.DB_URL)
+.then(()=>{
+    console.log("Connection open for mongoose")
+})
+
+.catch(err =>{
+    console.log("Oh no mongo threw an error")
+    console.log(err)
+
+})
 
 
 

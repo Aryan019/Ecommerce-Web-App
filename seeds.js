@@ -4,7 +4,22 @@ const Product = require('./models/product.js')
 
 // Establishing connection with mongoose
 const mongoose = require('mongoose')
-mongoose.connect('mongodb://127.0.0.1:27017/rabloAssignDB')
+
+// Offline connection 
+// mongoose.connect('mongodb://127.0.0.1:27017/rabloAssignDB')
+// .then(()=>{
+//     console.log("Connection open for mongoose")
+// })
+
+// .catch(err =>{
+//     console.log("Oh no mongo threw an error")
+//     console.log(err)
+
+// })
+require("dotenv").config()
+
+
+mongoose.connect(process.env.DB_URL)
 .then(()=>{
     console.log("Connection open for mongoose")
 })
@@ -14,6 +29,8 @@ mongoose.connect('mongodb://127.0.0.1:27017/rabloAssignDB')
     console.log(err)
 
 })
+
+
 
 // Use this for seeding
 const productsData = [
